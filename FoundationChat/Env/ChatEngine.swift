@@ -1,5 +1,6 @@
 import FoundationModels
 import SwiftUI
+import Playgrounds
 
 @Observable
 class ChatEngine {
@@ -20,7 +21,7 @@ class ChatEngine {
     self.conversation = conversation
     session = LanguageModelSession {
       """
-      You're an helpful chatbot. The user will send you messages, and you'll respond to them. 
+      You're an helpful chatbot. The user will send you messages, and you'll respond to them.
       Be short, it's a chat application.
       You can also summarize the conversation when asked to.
       Each messages will have a role, either user or assistant or system for initial conversation configuration.
@@ -32,14 +33,15 @@ class ChatEngine {
     session.prewarm()
   }
 
-  func respondTo(message: Message) async -> LanguageModelSession.ResponseStream<MessageGenerable>? {
-    session.streamResponse(generating: MessageGenerable.self) {
+  func respondTo() async -> LanguageModelSession.ResponseStream<MessageGenerable>? {
+    let response = session.streamResponse(generating: MessageGenerable.self) {
       """
       Here is the conversation history:
-      \(conversation.messages.map { "Role: \($0.role.rawValue)\nContent: \($0.content)" }.joined(separator: "\n\n"))
+      \(conversation.sortedMessages.map { "Role: \($0.role.rawValue)\nContent: \($0.content)" }.joined(separator: "\n\n"))
       You should respond with the assistant role to the user last message.
       """
     }
+    return response
   }
 
   func summarize() async -> LanguageModelSession.ResponseStream<String>? {

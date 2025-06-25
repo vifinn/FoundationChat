@@ -7,13 +7,13 @@ struct ConversationsListView: View {
 
   var body: some View {
     NavigationStack {
-      List(conversations) { conversation in
+      List(conversations.sorted(by: { $0.lastMessageTimestamp > $1.lastMessageTimestamp })) { conversation in
         NavigationLink(value: conversation) {
           ConversationRowView(conversation: conversation)
-            .listSectionSeparator(.hidden, edges: .top)
             .swipeActions {
               Button(role: .destructive) {
                 modelContext.delete(conversation)
+                try? modelContext.save()
               } label: {
                 Label("Delete", systemImage: "trash")
               }

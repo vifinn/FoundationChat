@@ -1,0 +1,28 @@
+import SwiftUI
+
+struct ConversationMessageView: View {
+  var message: Message
+
+  var body: some View {
+    HStack {
+      if message.role == .user {
+        Spacer()
+      }
+      VStack(alignment: .leading) {
+        Text(message.content)
+          .font(.subheadline)
+          .contentTransition(.interpolate)
+          .animation(.bouncy, value: message.content)
+      }
+      .padding()
+      .glassEffect(
+        .regular.tint(message.role == .user ? .blue : .green), in: .rect(cornerRadius: 16)
+      )
+      .padding(.horizontal)
+      .animation(.bouncy, value: message.content)
+      if message.role == .assistant {
+        Spacer()
+      }
+    }
+  }
+}
