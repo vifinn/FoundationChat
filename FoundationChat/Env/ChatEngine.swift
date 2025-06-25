@@ -27,6 +27,14 @@ class ChatEngine {
     conversationHistory.components(separatedBy: .whitespacesAndNewlines).count
   }
 
+  private var estimatedTokenCount: Int {
+    // Rough estimation: 1 token ≈ 0.75 words for English
+    Int(Double(conversationHistorySize) / 0.75)
+  }
+
+  private let maxTokens = 4096
+  private let safeTokenLimit = 3500
+
   init(conversation: Conversation) {
     self.conversation = conversation
     session = LanguageModelSession {
@@ -44,7 +52,7 @@ class ChatEngine {
   }
 
   func respondTo() async -> LanguageModelSession.ResponseStream<MessageGenerable>? {
-    if conversationHistorySize < 4000 {
+    if estimatedTokenCount < safeTokenLimit {
       return session.streamResponse(generating: MessageGenerable.self) {
         """
         Here is the conversation history:
@@ -66,14 +74,14 @@ class ChatEngine {
   }
 
   func summarize() async -> LanguageModelSession.ResponseStream<String>? {
-    if conversationHistorySize < 4000 {
+    if estimatedTokenCount < safeTokenLimit {
       return session.streamResponse {
         """
         Write a 1-2 sentence summary of what was discussed.
         Start directly with the topic itself.
         Example: "Swift programming techniques and best practices for error handling."
         DO NOT start with phrases like "The conversation is about" or "The discussion covers".
-        
+
         Conversation to summarize:
         \(conversationHistory)
         """
@@ -84,10 +92,10 @@ class ChatEngine {
         Update the summary to include new information, keeping it to 1-2 sentences.
         Start directly with the topic itself.
         DO NOT start with phrases like "The conversation is about" or "The discussion covers".
-        
+
         Previous summary:
         \(conversation.summary ?? "No summary available")
-        
+
         Latest message:
         \(conversation.messages.last?.content ?? "No message available")
         """

@@ -24,7 +24,6 @@ struct ConversationDetailView: View {
       .padding(.bottom, 50)
     }
     .onAppear {
-      chatEngine.prewarm()
       isInputFocused = true
       withAnimation {
         scrollPosition.scrollTo(edge: .bottom)
