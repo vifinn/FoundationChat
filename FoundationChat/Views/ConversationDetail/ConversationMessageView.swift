@@ -12,7 +12,6 @@ struct ConversationMessageView: View {
         Text(message.content)
           .font(.subheadline)
           .contentTransition(.interpolate)
-          .animation(.bouncy, value: message.content)
       }
       .padding()
       .glassEffect(

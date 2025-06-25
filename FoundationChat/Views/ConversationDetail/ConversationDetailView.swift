@@ -43,8 +43,8 @@ struct ConversationDetailView: View {
         onSend: {
           isGenerating = true
           try? await streamNewMessage()
-          isGenerating = false
           try? await updateConversationSummary()
+          isGenerating = false
         }
       )
     }

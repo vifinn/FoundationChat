@@ -12,7 +12,9 @@ struct ConversationRowView: View {
         Text(conversation.summary ?? "No summary")
           .font(.subheadline)
           .foregroundStyle(.secondary)
+          .contentTransition(.interpolate)
       }
+      .animation(.bouncy, value: conversation.summary)
       Spacer()
       Text(
         Date(
