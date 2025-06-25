@@ -26,10 +26,8 @@ struct ConversationDetailView: View {
     .onAppear {
       chatEngine.prewarm()
       isInputFocused = true
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-        withAnimation {
-          scrollPosition.scrollTo(edge: .bottom)
-        }
+      withAnimation {
+        scrollPosition.scrollTo(edge: .bottom)
       }
     }
     .scrollDismissesKeyboard(.interactively)
@@ -61,6 +59,9 @@ extension ConversationDetailView {
         timestamp: Date()))
     try? modelContext.save()
     newMessage = ""
+    withAnimation {
+      scrollPosition.scrollTo(edge: .bottom)
+    }
     if let stream = await chatEngine.respondTo() {
       let newMessage = Message(
         content: "...",
@@ -69,6 +70,7 @@ extension ConversationDetailView {
       conversation.messages.append(newMessage)
       for try await part in stream {
         newMessage.content = part.content ?? ""
+        scrollPosition.scrollTo(edge: .bottom)
       }
       try modelContext.save()
     }

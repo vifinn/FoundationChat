@@ -2,6 +2,8 @@
 
 A SwiftUI chat application built with Apple's Foundation Models framework, showcasing on-device AI capabilities with persistent conversation storage.
 
+![Preview](Images/image.png)
+
 ## Requirements
 
 - **iOS 26.0+** / iPadOS 26.0+ / macOS 26.0+ / visionOS 26.0+

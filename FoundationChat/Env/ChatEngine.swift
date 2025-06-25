@@ -71,7 +71,8 @@ class ChatEngine {
         """
         Here is the conversation history:
         \(conversation.messages.map { "Role: \($0.role.rawValue)\nContent: \($0.content)" }.joined(separator: "\n\n"))
-        Summarize the conversation in one sentence or two sentences.
+        Summarize the conversation in one or two sentences. Be short and concise, don't repeat who is talking. Don't say stuff like "The user or the assistant"
+        The goal of the summary if for the user or you to know what the conversation is about.
         """
       }
     } else {
@@ -81,7 +82,8 @@ class ChatEngine {
         \(conversation.summary ?? "No summary available")
         And the last message from the user:
         \(conversation.messages.last?.content ?? "No message available")
-        Summarize the conversation in one or two sentences.
+        Summarize the conversation in one or two sentences. Be short and concise, don't repeat who is talking. Don't say stuff like "The user or the assistant"
+        The goal of the summary if for the user or you to know what the conversation is about.
         """
       }
     }
