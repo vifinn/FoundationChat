@@ -1,6 +1,6 @@
 import FoundationModels
-import SwiftUI
 import Playgrounds
+import SwiftUI
 
 @Observable
 class ChatEngine {
@@ -15,6 +15,16 @@ class ChatEngine {
     default:
       return false
     }
+  }
+
+  var conversationHistory: String {
+    conversation.sortedMessages.map {
+      "Role: \($0.role.rawValue)\nContent: \($0.content)"
+    }.joined(separator: "\n\n")
+  }
+
+  var conversationHistorySize: Int {
+    conversationHistory.components(separatedBy: .whitespacesAndNewlines).count
   }
 
   init(conversation: Conversation) {
@@ -34,23 +44,46 @@ class ChatEngine {
   }
 
   func respondTo() async -> LanguageModelSession.ResponseStream<MessageGenerable>? {
-    let response = session.streamResponse(generating: MessageGenerable.self) {
-      """
-      Here is the conversation history:
-      \(conversation.sortedMessages.map { "Role: \($0.role.rawValue)\nContent: \($0.content)" }.joined(separator: "\n\n"))
-      You should respond with the assistant role to the user last message.
-      """
+    if conversationHistorySize < 4000 {
+      return session.streamResponse(generating: MessageGenerable.self) {
+        """
+        Here is the conversation history:
+        \(conversationHistory)
+        Respond with the assistant role to the user last message.
+        """
+      }
+    } else {
+      return session.streamResponse(generating: MessageGenerable.self) {
+        """
+        Here is the conversation summary:
+        \(conversation.summary ?? "No summary available")
+        And the last message from the user:
+        \(conversation.messages.last?.content ?? "No message available")
+        Respond with the assistant role to the user last message.
+        """
+      }
     }
-    return response
   }
 
   func summarize() async -> LanguageModelSession.ResponseStream<String>? {
-    session.streamResponse {
-      """
-      Here is the conversation history:
-      \(conversation.messages.map { "Role: \($0.role.rawValue)\nContent: \($0.content)" }.joined(separator: "\n\n"))
-      Summarize the conversation in one sentence.
-      """
+    if conversationHistorySize < 4000 {
+      return session.streamResponse {
+        """
+        Here is the conversation history:
+        \(conversation.messages.map { "Role: \($0.role.rawValue)\nContent: \($0.content)" }.joined(separator: "\n\n"))
+        Summarize the conversation in one sentence or two sentences.
+        """
+      }
+    } else {
+      return session.streamResponse {
+        """
+        Here is the previous conversation summary:
+        \(conversation.summary ?? "No summary available")
+        And the last message from the user:
+        \(conversation.messages.last?.content ?? "No message available")
+        Summarize the conversation in one or two sentences.
+        """
+      }
     }
   }
 }

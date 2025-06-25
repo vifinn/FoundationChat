@@ -9,6 +9,7 @@ struct ConversationDetailView: View {
   @State var newMessage: String = ""
   @State var conversation: Conversation
   @State var scrollPosition: ScrollPosition = .init()
+  @State var isGenerating: Bool = false
   @FocusState var isInputFocused: Bool
 
   var body: some View {
@@ -23,6 +24,7 @@ struct ConversationDetailView: View {
       .padding(.bottom, 50)
     }
     .onAppear {
+      chatEngine.prewarm()
       isInputFocused = true
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
         withAnimation {
@@ -36,24 +38,22 @@ struct ConversationDetailView: View {
     .navigationBarTitleDisplayMode(.inline)
     .toolbarRole(.editor)
     .toolbar {
-      ToolbarItemGroup(placement: .bottomBar) {
-        TextField("Message", text: $newMessage)
-          .textFieldStyle(.plain)
-          .padding()
-          .contentShape(Rectangle())
-          .focused($isInputFocused)
-        Button(action: {
-          Task {
-            try? await streamNewMessage()
-            try? await updateConversationSummary()
-          }
-        }) {
-          Label("Send", systemImage: "paperplane")
+      ConversationDetailInputView(
+        newMessage: $newMessage,
+        isGenerating: $isGenerating,
+        isInputFocused: $isInputFocused,
+        onSend: {
+          isGenerating = true
+          try? await streamNewMessage()
+          isGenerating = false
+          try? await updateConversationSummary()
         }
-      }
+      )
     }
   }
+}
 
+extension ConversationDetailView {
   private func streamNewMessage() async throws {
     conversation.messages.append(
       Message(
