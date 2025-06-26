@@ -10,7 +10,7 @@ struct ConversationDetailInputView: ToolbarContent {
   var body: some ToolbarContent {
     ToolbarItemGroup(placement: .bottomBar) {
       TextField("New message to the assistant", text: $newMessage)
-        .textFieldStyle(.roundedBorder)
+        .textFieldStyle(.plain)
         .padding()
         .contentShape(Rectangle())
         .focused(isInputFocused)
