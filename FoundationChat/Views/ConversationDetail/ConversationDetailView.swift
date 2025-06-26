@@ -16,7 +16,7 @@ struct ConversationDetailView: View {
     ScrollView {
       LazyVStack {
         ForEach(conversation.sortedMessages) { message in
-          ConversationMessageView(message: message)
+          MessageView(message: message)
             .id(message.id)
         }
       }
