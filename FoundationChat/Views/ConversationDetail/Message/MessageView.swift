@@ -24,3 +24,14 @@ struct MessageView: View {
     }
   }
 }
+
+#Preview {
+  LazyVStack {
+    MessageView(message: .init(content: "Hello world this is a short message",
+                               role: .user,
+                               timestamp: Date()))
+    MessageView(message: .init(content: "Hello world this is a short message",
+                               role: .assistant,
+                               timestamp: Date()))
+  }
+}

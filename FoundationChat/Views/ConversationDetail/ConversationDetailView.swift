@@ -96,3 +96,20 @@ extension ConversationDetailView {
     }
   }
 }
+
+#Preview {
+  @Previewable var conversation: Conversation = .init(
+    messages: [
+      .init(
+        content: "Hello world",
+        role: .user,
+        timestamp: Date()),
+      .init(
+        content: "How may I asist you today?",
+        role: .assistant,
+        timestamp: Date())
+    ],
+    summary: "A preview conversation")
+  ConversationDetailView(conversation: conversation)
+  .environment(ChatEngine(conversation: conversation))
+}
