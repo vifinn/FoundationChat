@@ -67,10 +67,13 @@ extension ConversationDetailView {
         role: .assistant,
         timestamp: Date())
       conversation.messages.append(newMessage)
-      
+
       do {
         for try await part in stream {
           newMessage.content = part.content ?? ""
+          newMessage.attachementTitle = part.metadata?.title
+          newMessage.attachementThumbnail = part.metadata?.thumbnail
+          newMessage.attachementDescription = part.metadata?.description
           scrollPosition.scrollTo(edge: .bottom)
         }
         try modelContext.save()

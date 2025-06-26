@@ -37,7 +37,7 @@ class ChatEngine {
 
   init(conversation: Conversation) {
     self.conversation = conversation
-    session = LanguageModelSession {
+    session = LanguageModelSession(tools: [WebAnalyserTool()]) {
       """
       You're an helpful chatbot. The user will send you messages, and you'll respond to them.
       Be short, it's a chat application.
@@ -58,6 +58,7 @@ class ChatEngine {
         Here is the conversation history:
         \(conversationHistory)
         Respond with the assistant role to the user last message.
+        If there is a URL in the user's message, use the WebAnalyserTool to analyse the webpage and add the attachment to the message.
         """
       }
     } else {
@@ -68,6 +69,7 @@ class ChatEngine {
         And the last message from the user:
         \(conversation.messages.last?.content ?? "No message available")
         Respond with the assistant role to the user last message.
+        If there is a URL in the user's message, use the WebAnalyserTool to analyse the webpage and add the attachment to the message.
         """
       }
     }
