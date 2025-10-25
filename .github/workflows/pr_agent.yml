@@ -1,32 +1,24 @@
-name: Agent reviewer
-
+name: PR Agent (Gemini)
 on:
   pull_request:
-    branches: [main]
-
-permissions:
-  pull-requests: write
-  contents: read
-
+    types: [opened, reopened, ready_for_review]
+  issue_comment:
 jobs:
-  build:
+  pr_agent_job:
+    if: ${{ github.event.sender.type != 'Bot' }}
     runs-on: ubuntu-latest
-
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: write
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Install shippie
-        run: bun i shippie
-
-      - name: Run shippie review
-        run: bun shippie review --platform=github
+      - name: PR Agent action step
+        uses: qodo-ai/pr-agent@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          GITHUB_SHA: ${{ github.sha }}
+          config.model: 'gemini/gemini-1.5-flash'
+          config.fallback_models: '["gemini/gemini-1.5-flash"]'
+          GOOGLE_AI_STUDIO.GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          github_action_config.auto_review: 'true'
+          github_action_config.auto_describe: 'true'
+          github_action_config.auto_improve: 'true'
